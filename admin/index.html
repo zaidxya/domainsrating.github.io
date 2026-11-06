@@ -1,138 +1,487 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Domains ratings</title>
-<link rel="icon" href="/favicon.png" type="image/png">
+<title>تقييمات دومينز</title>
+<link rel="icon" href="../favicon.png" type="image/png">
+<script>try{if(localStorage.getItem("lang")==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr"}}catch(e){}</script>
 <style>
-  :root { --navy:#293c88; --navy-deep:#2d3f7c; --violet:#815eea; --bg:#f5f7fb; --card:#fff; --text:#1e2a4a;
-          --muted:#6e7691; --line:#e3e7f1; --brand-grad:linear-gradient(90deg,#815eea 0%,#293c88 100%); }
+  :root { --navy:#293c88; --navy-deep:#2d3f7c; --violet:#815eea; --violet-deep:#7d49e8; --bg:#f5f7fb; --card:#fff;
+          --text:#1e2a4a; --muted:#6e7691; --line:#e3e7f1; --soft:#ede9fb;
+          --brand-grad:linear-gradient(90deg,#815eea 0%,#293c88 100%);
+          --side-grad:linear-gradient(180deg,#38429a 0%,#534db8 55%,#775bdf 100%);
+          --ok:#1c8a55; --warn:#b7791f; --bad:#c0352b; }
   * { box-sizing:border-box; }
   body { margin:0; font-family:"Tajawal","Segoe UI","Noto Sans Arabic",system-ui,Tahoma,sans-serif; background:var(--bg); color:var(--text); }
-  header { background:var(--brand-grad); color:#fff; padding:.9rem 1.25rem; }
-  .head-in { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:.75rem; }
-  .logo-img { height:36px; width:auto; display:block; }
-  .head-title { margin-inline-start:auto; font-weight:600; opacity:.9; }
-  main { max-width:1400px; margin:0 auto; padding:1.25rem 1rem 2rem; }
-  h1 { font-size:1.35rem; margin:0 0 .2rem; color:var(--navy-deep); }
-  .lead { color:var(--muted); margin:0 0 1.1rem; }
-  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.85rem; }
-  .stat { display:flex; align-items:center; gap:.9rem; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; }
-  .ico { width:42px; height:42px; border-radius:10px; display:grid; place-items:center; flex:none; }
-  .ico svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  button { font:inherit; }
+
+  /* ---------- Layout ---------- */
+  .shell { display:grid; grid-template-columns:250px minmax(0,1fr); min-height:100vh; }
+  .side { background:var(--side-grad); color:#fff; padding:1.1rem .9rem; position:sticky; top:0; height:100vh; }
+  .side .logo-img { height:34px; width:auto; display:block; margin:.2rem .4rem 1.8rem; }
+  .nav-title { font-size:.78rem; opacity:.75; margin:0 .6rem .5rem; }
+  .side a { display:flex; align-items:center; gap:.7rem; color:#fff; text-decoration:none; padding:.65rem .8rem; border-radius:10px; margin-bottom:.25rem; font-size:.95rem; opacity:.92; }
+  .side a:hover { background:rgba(255,255,255,.12); }
+  .side a.active { background:#e4e4f7; color:var(--navy-deep); font-weight:700; opacity:1; }
+  .ic { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .content { min-width:0; }
+  .top { background:var(--brand-grad); color:#fff; padding:.85rem 1.5rem; display:flex; align-items:center; gap:1rem; min-height:64px; }
+  .top-logo { display:none; height:30px; width:auto; }
+  .top-title { font-weight:700; font-size:1.05rem; }
+  .top-actions { margin-inline-start:auto; display:flex; gap:.5rem; }
+  .hbtn { display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.5); color:#fff; border-radius:8px; padding:.4rem .85rem; cursor:pointer; font-size:.9rem; }
+  .hbtn:hover { background:rgba(255,255,255,.25); }
+  .hbtn:disabled { opacity:.6; cursor:wait; }
+  .hbtn .ic { width:16px; height:16px; }
+  main { padding:1.5rem; max-width:1500px; }
+  h1 { font-size:1.4rem; margin:0 0 .2rem; color:var(--navy-deep); }
+  .lead { color:var(--muted); margin:0 0 1.2rem; }
+  section { scroll-margin-top:1rem; margin-bottom:1.6rem; }
+
+  /* ---------- Cards ---------- */
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 2px 10px rgba(41,60,136,.05); }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.9rem; margin-bottom:1rem; }
+  .stat { display:flex; align-items:center; gap:.9rem; padding:1rem 1.1rem; }
+  .ico { width:46px; height:46px; border-radius:12px; display:grid; place-items:center; flex:none; }
+  .ico .ic { width:23px; height:23px; }
   .t1 { background:#ede9fb; color:#7d49e8; } .t2 { background:#fdeceb; color:#ec7358; }
-  .t3 { background:#eaf8ed; color:#2f9d57; } .t4 { background:#e5e7f0; color:#2d3f7c; }
-  .stat b { display:block; font-size:1.6rem; line-height:1.2; }
-  .stat span { color:var(--muted); font-size:.9rem; }
-  .bar { display:flex; gap:.5rem; margin:1.1rem 0; flex-wrap:wrap; }
-  .bar input, .bar select { padding:.6rem .75rem; border-radius:8px; border:1px solid var(--line); background:var(--card); color:inherit; font:inherit; }
-  .bar input { flex:1; min-width:220px; }
-  .bar input:focus, .bar select:focus { outline:2px solid var(--violet); outline-offset:1px; }
-  .wrap { overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; }
-  table { width:100%; border-collapse:collapse; }
-  th, td { padding:.65rem .8rem; text-align:start; border-bottom:1px solid var(--line); vertical-align:top; font-size:.92rem; }
-  th { color:var(--muted); font-size:.82rem; background:var(--bg); white-space:nowrap; font-weight:600; }
+  .t3 { background:#eaf8ed; color:#2f9d57; } .t4 { background:#e5e7f0; color:#2d3f7c; } .t5 { background:#e3effb; color:#4183cc; }
+  .stat b { display:block; font-size:1.65rem; line-height:1.15; }
+  .stat b small { font-size:.8rem; color:var(--muted); font-weight:500; margin-inline-start:.25rem; }
+  .stat span { color:var(--muted); font-size:.88rem; }
+
+  .charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:.9rem; }
+  .chart { padding:1.1rem 1.2rem 1.2rem; }
+  .chart h3 { margin:0 0 1rem; font-size:1rem; color:var(--navy-deep); }
+  .chart.wide { grid-column:1 / -1; }
+  @media (min-width:1100px) { .charts { grid-template-columns:1fr 1fr 1.4fr; } .chart.wide { grid-column:auto; } }
+  .dist-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.65rem; }
+  .dist-label { width:2.6rem; direction:ltr; text-align:end; font-size:.9rem; color:var(--muted); white-space:nowrap; }
+  .dist-label::first-letter { color:var(--text); font-weight:700; }
+  .track { flex:1; height:12px; background:#eef0f7; border-radius:99px; overflow:hidden; }
+  .fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#815eea,#293c88); min-width:0; transition:width .4s; }
+  [dir=rtl] .fill { background:linear-gradient(270deg,#815eea,#293c88); }
+  .dist-n { width:2.2rem; font-weight:700; font-size:.9rem; }
+  .donut-wrap { display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; justify-content:center; }
+  .donut { width:150px; height:150px; flex:none; }
+  .donut text { font-weight:700; fill:var(--navy-deep); }
+  .legend { display:flex; flex-direction:column; gap:.5rem; font-size:.92rem; }
+  .legend i { display:inline-block; width:11px; height:11px; border-radius:50%; margin-inline-end:.5rem; }
+  .legend b { margin-inline-start:.4rem; }
+  .chart-svg { width:100%; height:auto; display:block; direction:ltr; }
+  .chart-svg text { font-size:11px; fill:var(--muted); font-family:inherit; }
+  .chart-svg .val { fill:var(--navy-deep); font-weight:700; }
+  .none { color:var(--muted); text-align:center; padding:1.5rem 0; }
+
+  /* ---------- Table ---------- */
+  .tbl-head { padding:1.1rem 1.2rem .4rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+  .tbl-head h2 { margin:0; font-size:1.1rem; color:var(--navy-deep); margin-inline-end:auto; }
+  .searchbox { position:relative; flex:1 1 280px; max-width:440px; }
+  .searchbox .ic { position:absolute; top:50%; transform:translateY(-50%); inset-inline-start:.75rem; width:18px; height:18px; color:var(--muted); }
+  .tbl-head .searchbox input { width:100%; padding:.6rem .8rem; padding-inline-start:2.4rem; }
+  .tbl-head input, .tbl-head select { border:1px solid var(--line); border-radius:8px; background:#fff; color:inherit; font:inherit; padding:.6rem .75rem; }
+  .tbl-head input:focus, .tbl-head select:focus { outline:2px solid var(--violet); outline-offset:1px; border-color:var(--violet); }
+  .scroll { overflow-x:auto; margin-top:.6rem; }
+  table { width:100%; border-collapse:collapse; min-width:980px; }
+  th, td { padding:.75rem 1rem; text-align:start; border-bottom:1px solid var(--line); vertical-align:top; font-size:.92rem; }
+  th { background:var(--bg); color:var(--muted); font-size:.82rem; font-weight:600; white-space:nowrap; }
   tbody tr:hover { background:#faf9ff; }
-  td.comment { min-width:240px; }
+  tbody tr:last-child td { border-bottom:0; }
+  .nowrap { white-space:nowrap; }
+  .main { line-height:1.4; } .strong { font-weight:700; }
+  .sub { color:var(--muted); font-size:.82rem; line-height:1.4; }
+  .pill { display:inline-block; direction:ltr; padding:.15rem .6rem; border-radius:99px; font-weight:700; font-size:.85rem; }
+  .p5, .p4 { background:#e6f6ec; color:var(--ok); } .p3 { background:#fff4de; color:var(--warn); } .p2, .p1 { background:#fdeceb; color:var(--bad); }
+  .b-yes { background:#e6f6ec; color:var(--ok); } .b-maybe { background:#fff4de; color:var(--warn); } .b-no { background:#fdeceb; color:var(--bad); }
+  .badge { display:inline-block; padding:.15rem .65rem; border-radius:99px; font-size:.82rem; font-weight:600; }
+  .dash { color:var(--muted); }
+  td.comment { min-width:260px; max-width:360px; }
+  .clamp { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; cursor:pointer; line-height:1.5; }
+  .clamp.open { -webkit-line-clamp:unset; display:block; }
+  .state { text-align:center; color:var(--muted); padding:2.5rem 1rem !important; }
+  .pager { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.85rem 1.2rem; border-top:1px solid var(--line); flex-wrap:wrap; color:var(--muted); font-size:.9rem; }
+  .pager div { display:flex; gap:.5rem; }
+  .pager button { background:#fff; border:1px solid var(--line); border-radius:8px; padding:.4rem .9rem; cursor:pointer; color:var(--navy-deep); font-weight:600; }
+  .pager button:hover:not(:disabled) { border-color:var(--violet); background:var(--soft); }
+  .pager button:disabled { opacity:.45; cursor:default; }
+
+  @media (max-width:860px) {
+    .shell { grid-template-columns:1fr; }
+    .side { display:none; }
+    .top-logo { display:block; }
+    .top { padding:.75rem 1rem; }
+    .top-title { display:none; }
+    main { padding:1rem; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <div class="head-in">
-    <img class="logo-img" src="/logo-white.png" alt="Domains">
-    <span class="head-title">Ratings dashboard</span>
+<div class="shell">
+  <aside class="side">
+    <img class="logo-img" src="../logo-white.png" alt="Domains">
+    <div class="nav-title" data-i18n="navMain"></div>
+    <a href="#overview" id="nav-overview" class="active">
+      <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span data-i18n="navOverview"></span>
+    </a>
+    <a href="#ratings" id="nav-ratings">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <span data-i18n="navRatings"></span>
+    </a>
+  </aside>
+
+  <div class="content">
+    <header class="top">
+      <img class="top-logo" src="../logo-white.png" alt="Domains">
+      <div class="top-title" data-i18n="topTitle"></div>
+      <div class="top-actions">
+        <button id="refresh" class="hbtn" type="button">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          <span data-i18n="refresh"></span>
+        </button>
+        <button id="langBtn" class="hbtn" type="button">English</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="overview">
+        <h1 data-i18n="h1"></h1>
+        <p class="lead" data-i18n="lead"></p>
+        <div class="stats" id="stats"></div>
+        <div class="charts">
+          <div class="card chart"><h3 data-i18n="distTitle"></h3><div id="dist"></div></div>
+          <div class="card chart"><h3 data-i18n="recTitle"></h3><div id="rec"></div></div>
+          <div class="card chart wide"><h3 data-i18n="dayTitle"></h3><div id="days"></div></div>
+        </div>
+      </section>
+
+      <section id="ratings">
+        <div class="card">
+          <div class="tbl-head">
+            <h2 data-i18n="tableTitle"></h2>
+            <div class="searchbox">
+              <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <input id="q" type="search" data-i18n-ph="searchPh">
+            </div>
+            <select id="min">
+              <option value="0" data-i18n="filterAll"></option>
+              <option value="4" data-i18n="filterPos"></option>
+              <option value="1" data-i18n="filterLow"></option>
+            </select>
+            <select id="level"></select>
+          </div>
+          <div class="scroll">
+            <table>
+              <thead><tr id="head"></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span id="info"></span>
+            <div>
+              <button id="prev" type="button" data-i18n="prev"></button>
+              <button id="next" type="button" data-i18n="next"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
-</header>
-<main>
-  <h1>Domains ratings</h1>
-  <p class="lead">Overview of the feedback submitted on the rating page</p>
-  <div class="stats" id="stats"></div>
-  <div class="bar">
-    <input id="q" placeholder="Search name, phone, email, university, major, comment...">
-    <select id="min">
-      <option value="0">All ratings</option>
-      <option value="4">4★ and up</option>
-      <option value="1">1★ to 2★ only</option>
-    </select>
-  </div>
-  <div class="wrap">
-    <table>
-      <thead><tr><th>Date</th><th>Full name</th><th>Phone</th><th>Email</th><th>University</th><th>Major</th><th>Level</th><th>Heard via</th><th>Overall</th><th>Study zone</th><th>Courses</th><th>Recommend</th><th>Comment</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-  </div>
-</main>
+</div>
+
 <script>
-let all = [];
+const T = {
+  en: {
+    pageTitle: 'Domains ratings', navMain: 'Main', navOverview: 'Overview', navRatings: 'Ratings',
+    topTitle: 'Ratings dashboard', refresh: 'Refresh', otherLang: 'العربية',
+    h1: 'Ratings overview', lead: 'A summary of the feedback submitted on the rating page',
+    sTotal: 'Total ratings', sOverall: 'Overall average', sStudy: 'Study zone average', sCourses: 'Courses average', sRec: 'Would recommend',
+    outOf: '/ 5', ofAnswers: 'of answers',
+    distTitle: 'Overall rating distribution', recTitle: 'Would they recommend Domains?', dayTitle: 'Ratings per day (last 14 days)',
+    noAnswers: 'No answers yet', rec_yes: 'Yes', rec_maybe: 'Maybe', rec_no: 'No',
+    tableTitle: 'All ratings', searchPh: 'Search name, phone, email, university, major, comment...',
+    filterAll: 'All ratings', filterPos: 'Positive (4–5 stars)', filterLow: 'Low (1–2 stars)', levelAll: 'All levels',
+    cDate: 'Date', cName: 'Full name', cContact: 'Contact', cUni: 'University', cLevel: 'Level',
+    cOverall: 'Overall', cStudy: 'Study zone', cCourses: 'Courses', cRec: 'Recommend', cComment: 'Comment',
+    showing: 'Showing {a}–{b} of {n}', prev: 'Previous', next: 'Next',
+    empty: 'No ratings match your search.', noData: 'No ratings yet.', loadError: 'Could not load ratings. Please refresh.', loading: 'Loading…',
+    expand: 'Click to expand',
+    levels: { y1:'First year', y2:'Second year', y3:'Third year', y4:'Fourth year or above', graduate:'Graduate', postgrad:'Postgraduate', other:'Other' },
+    sources: { social:'Social media', friend:'Friend or colleague', university:'University', event:'Event or workshop', other:'Other' }
+  },
+  ar: {
+    pageTitle: 'تقييمات دومينز', navMain: 'الرئيسية', navOverview: 'نظرة عامة', navRatings: 'التقييمات',
+    topTitle: 'لوحة التقييمات', refresh: 'تحديث', otherLang: 'English',
+    h1: 'نظرة عامة على التقييمات', lead: 'ملخص شامل للملاحظات المرسلة عبر صفحة التقييم',
+    sTotal: 'إجمالي التقييمات', sOverall: 'متوسط التقييم العام', sStudy: 'متوسط منطقة الدراسة', sCourses: 'متوسط الدورات', sRec: 'ينصحون بدومينز',
+    outOf: '/ 5', ofAnswers: 'من الإجابات',
+    distTitle: 'توزيع التقييم العام', recTitle: 'هل ينصحون بدومينز؟', dayTitle: 'التقييمات يوميًا (آخر 14 يومًا)',
+    noAnswers: 'لا توجد إجابات بعد', rec_yes: 'نعم', rec_maybe: 'ربما', rec_no: 'لا',
+    tableTitle: 'جميع التقييمات', searchPh: 'ابحث بالاسم أو الهاتف أو البريد أو الجامعة أو التخصص أو الملاحظة...',
+    filterAll: 'كل التقييمات', filterPos: 'إيجابية (4–5 نجوم)', filterLow: 'منخفضة (1–2 نجمة)', levelAll: 'كل المستويات',
+    cDate: 'التاريخ', cName: 'الاسم الثلاثي', cContact: 'التواصل', cUni: 'الجامعة', cLevel: 'المستوى',
+    cOverall: 'التقييم العام', cStudy: 'منطقة الدراسة', cCourses: 'الدورات', cRec: 'التوصية', cComment: 'الملاحظات',
+    showing: 'عرض {a}–{b} من {n}', prev: 'السابق', next: 'التالي',
+    empty: 'لا توجد تقييمات مطابقة للبحث.', noData: 'لا توجد تقييمات بعد.', loadError: 'تعذر تحميل التقييمات. يرجى تحديث الصفحة.', loading: 'جارٍ التحميل…',
+    expand: 'اضغط للتوسيع',
+    levels: { y1:'السنة الأولى', y2:'السنة الثانية', y3:'السنة الثالثة', y4:'السنة الرابعة فأعلى', graduate:'خريج', postgrad:'دراسات عليا', other:'أخرى' },
+    sources: { social:'وسائل التواصل', friend:'صديق أو زميل', university:'الجامعة', event:'فعالية أو ورشة', other:'أخرى' }
+  }
+};
 
 const ICONS = {
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
   book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
-  cap: '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>'
+  cap: '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+  thumb: '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>'
 };
+const REC_COLORS = { yes: '#2f9d57', maybe: '#e8a317', no: '#ec7358' };
+const PAGE = 15;
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 
-async function load() {
-  const [stats, rows] = await Promise.all([
-    fetch('api/stats').then(r => r.json()),
-    fetch('api/ratings').then(r => r.json())
-  ]);
-  all = rows;
-  const box = document.getElementById('stats');
-  box.innerHTML = '';
-  [['Ratings', stats.count, 'users', 't1'], ['Overall avg', stats.overall ?? '-', 'star', 't2'],
-   ['Study zone avg', stats.study_zone ?? '-', 'book', 't3'], ['Courses avg', stats.courses ?? '-', 'cap', 't4']]
-    .forEach(([label, val, icon, tone]) => {
-      const d = document.createElement('div');
-      d.className = 'stat';
-      const i = document.createElement('div');
-      i.className = 'ico ' + tone;
-      i.innerHTML = '<svg viewBox="0 0 24 24">' + ICONS[icon] + '</svg>';   // icons are fixed strings above, no user data
-      const t = document.createElement('div');
-      const b = document.createElement('b'); b.textContent = val;
-      const s = document.createElement('span'); s.textContent = label;
-      t.append(b, s);
-      d.append(i, t);
-      box.appendChild(d);
-    });
-  render();
+let lang = localStorage.getItem('lang') === 'en' ? 'en' : 'ar';   // Arabic is the default language
+let all = [], page = 1, loaded = false, failed = false;
+const t = k => T[lang][k];
+const locale = () => (lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB');   // Arabic words, Western digits (like the platform)
+
+// ---------- Language ----------
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.title = t('pageTitle');
+  document.querySelectorAll('[data-i18n]').forEach(e => e.textContent = t(e.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(e => e.placeholder = t(e.dataset.i18nPh));
+  $('langBtn').textContent = t('otherLang');
+  const sel = $('level'), cur = sel.value;
+  sel.innerHTML = '';
+  [['', t('levelAll')], ...Object.entries(t('levels'))].forEach(([v, label]) => {
+    const o = el('option', null, label); o.value = v; sel.appendChild(o);
+  });
+  sel.value = cur;
+  renderAll();
 }
 
-const LEVELS = { y1:'First year', y2:'Second year', y3:'Third year', y4:'Fourth year+', graduate:'Graduate', postgrad:'Postgraduate', other:'Other' };
-const SOURCES = { social:'Social media', friend:'Friend/colleague', university:'University', event:'Event/workshop', other:'Other' };
-const RECS = { yes:'Yes', maybe:'Maybe', no:'No' };
+// ---------- Data ----------
+async function load() {
+  $('refresh').disabled = true;
+  try {
+    const r = await fetch('api/ratings');
+    if (!r.ok) throw new Error('status ' + r.status);
+    all = await r.json();
+    failed = false;
+  } catch { failed = true; }
+  loaded = true;
+  $('refresh').disabled = false;
+  renderAll();
+}
 
-function render() {
-  const q = document.getElementById('q').value.toLowerCase();
-  const m = document.getElementById('min').value;
-  const tbody = document.getElementById('rows');
-  tbody.innerHTML = '';
-  all.filter(r => {
-    if (m === '4' && r.overall < 4) return false;
-    if (m === '1' && r.overall > 2) return false;
-    return !q || [r.name, r.phone, r.email, r.university, r.major, r.comment].some(v => (v || '').toLowerCase().includes(q));
-  }).forEach(r => {
-    const tr = document.createElement('tr');
-    const cells = [
-      new Date(r.created_at).toLocaleString(), r.name, r.phone, r.email, r.university, r.major,
-      LEVELS[r.study_level], SOURCES[r.heard_about], r.overall, r.study_zone, r.courses,
-      RECS[r.recommend], r.comment
-    ];
-    cells.forEach((v, i) => {
-      const td = document.createElement('td');
-      td.textContent = v ?? '-';          // textContent = comments can't inject HTML
-      if (i === 2 || i === 3) td.dir = 'ltr';                       // phone and email always read left to right
-      if (i === 12) { td.className = 'comment'; td.dir = 'auto'; }  // Arabic comments align correctly
-      else if (i === 1 || i === 4 || i === 5) td.dir = 'auto';      // Arabic names / universities align correctly
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+const fmt = v => v === null ? '-' : (Math.round(v * 10) / 10).toString();
+
+function renderAll() { renderStats(); renderDist(); renderRec(); renderDays(); renderTable(); }
+
+// ---------- Stat cards ----------
+function renderStats() {
+  const answered = all.filter(r => r.recommend);
+  const yes = answered.filter(r => r.recommend === 'yes').length;
+  const cards = [
+    [t('sTotal'), String(all.length), '', 'users', 't1'],
+    [t('sOverall'), fmt(avg(all.map(r => r.overall))), t('outOf'), 'star', 't2'],
+    [t('sStudy'), fmt(avg(all.filter(r => r.study_zone).map(r => r.study_zone))), t('outOf'), 'book', 't3'],
+    [t('sCourses'), fmt(avg(all.filter(r => r.courses).map(r => r.courses))), t('outOf'), 'cap', 't4'],
+    [t('sRec'), answered.length ? Math.round(100 * yes / answered.length) + '%' : '-', '', 'thumb', 't5']
+  ];
+  const box = $('stats'); box.innerHTML = '';
+  cards.forEach(([label, val, unit, icon, tone]) => {
+    const d = el('div', 'card stat');
+    const i = el('div', 'ico ' + tone);
+    i.innerHTML = '<svg class="ic" viewBox="0 0 24 24">' + ICONS[icon] + '</svg>';   // fixed icon strings, no user data
+    const body = el('div');
+    const b = el('b', null, val);
+    if (unit && val !== '-') b.appendChild(el('small', null, unit));
+    body.append(b, el('span', null, label));
+    d.append(i, body);
+    box.appendChild(d);
   });
 }
 
-document.getElementById('q').oninput = render;
-document.getElementById('min').onchange = render;
+// ---------- Charts ----------
+function renderDist() {
+  const box = $('dist'); box.innerHTML = '';
+  const counts = [0, 0, 0, 0, 0, 0];
+  all.forEach(r => { if (counts[r.overall] !== undefined) counts[r.overall]++; });
+  const max = Math.max(1, ...counts.slice(1));
+  for (let s = 5; s >= 1; s--) {
+    const row = el('div', 'dist-row');
+    const track = el('div', 'track'), fill = el('div', 'fill');
+    fill.style.width = (counts[s] / max * 100) + '%';
+    track.appendChild(fill);
+    row.append(el('span', 'dist-label', s + ' ★'), track, el('span', 'dist-n', counts[s]));
+    box.appendChild(row);
+  }
+}
+
+function renderRec() {
+  const box = $('rec'); box.innerHTML = '';
+  const counts = { yes: 0, maybe: 0, no: 0 };
+  all.forEach(r => { if (r.recommend in counts) counts[r.recommend]++; });
+  const total = counts.yes + counts.maybe + counts.no;
+  if (!total) { box.appendChild(el('div', 'none', t('noAnswers'))); return; }
+  const NS = 'http://www.w3.org/2000/svg', R = 48, C = 2 * Math.PI * R;
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 120 120'); svg.setAttribute('class', 'donut');
+  const ring = (color, len, offset) => {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', 60); c.setAttribute('cy', 60); c.setAttribute('r', R);
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', color); c.setAttribute('stroke-width', 14);
+    if (len !== null) {
+      c.setAttribute('stroke-dasharray', len + ' ' + (C - len));
+      c.setAttribute('stroke-dashoffset', -offset);
+      c.setAttribute('transform', 'rotate(-90 60 60)');
+    }
+    return c;
+  };
+  svg.appendChild(ring('#eceef6', null, 0));
+  let off = 0;
+  ['yes', 'maybe', 'no'].forEach(k => {
+    if (!counts[k]) return;
+    const len = counts[k] / total * C;
+    svg.appendChild(ring(REC_COLORS[k], len, off)); off += len;
+  });
+  const txt = document.createElementNS(NS, 'text');
+  txt.setAttribute('x', 60); txt.setAttribute('y', 68); txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('font-size', 22);
+  txt.textContent = Math.round(100 * counts.yes / total) + '%';
+  svg.appendChild(txt);
+  const legend = el('div', 'legend');
+  ['yes', 'maybe', 'no'].forEach(k => {
+    const row = el('div'); const dot = el('i'); dot.style.background = REC_COLORS[k];
+    row.append(dot, document.createTextNode(t('rec_' + k)), el('b', null, counts[k]));
+    legend.appendChild(row);
+  });
+  const wrap = el('div', 'donut-wrap'); wrap.append(svg, legend); box.appendChild(wrap);
+}
+
+const keyOf = d => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+
+function renderDays() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const days = [];
+  for (let i = 13; i >= 0; i--) { const d = new Date(today); d.setDate(today.getDate() - i); days.push({ d, n: 0 }); }
+  const idx = {}; days.forEach((x, i) => idx[keyOf(x.d)] = i);
+  all.forEach(r => { const k = keyOf(new Date(r.created_at)); if (k in idx) days[idx[k]].n++; });
+  const top = Math.max(2, ...days.map(x => x.n));
+  const W = 560, H = 190, L = 30, Rr = 8, Tp = 16, B = 34, pw = W - L - Rr, ph = H - Tp - B, step = pw / 14, bw = Math.min(22, step * 0.6);
+  let s = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('dayTitle')}"><defs><linearGradient id="barg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#815eea"/><stop offset="1" stop-color="#293c88"/></linearGradient></defs>`;
+  [0, 0.5, 1].forEach(f => {
+    const y = Tp + ph - f * ph;
+    s += `<line x1="${L}" x2="${W - Rr}" y1="${y}" y2="${y}" stroke="#e3e7f1" stroke-dasharray="3 4"/><text x="${L - 6}" y="${y + 4}" text-anchor="end">${Math.round(top * f)}</text>`;
+  });
+  days.forEach((x, i) => {
+    const cx = L + step * i + step / 2, h = x.n / top * ph, y = Tp + ph - h;
+    if (x.n) s += `<rect x="${cx - bw / 2}" y="${y}" width="${bw}" height="${h}" rx="4" fill="url(#barg)"/><text class="val" x="${cx}" y="${y - 4}" text-anchor="middle">${x.n}</text>`;
+    s += `<text x="${cx}" y="${H - 16}" text-anchor="middle">${x.d.getDate()}</text>`;
+    if (i === 0 || x.d.getDate() === 1) s += `<text x="${cx}" y="${H - 3}" text-anchor="middle">${x.d.toLocaleDateString(locale(), { month: 'short' })}</text>`;
+  });
+  $('days').innerHTML = s + '</svg>';
+}
+
+// ---------- Table ----------
+function filtered() {
+  const q = $('q').value.trim().toLowerCase(), m = $('min').value, lv = $('level').value;
+  return all.filter(r => {
+    if (m === '4' && r.overall < 4) return false;
+    if (m === '1' && r.overall > 2) return false;
+    if (lv && r.study_level !== lv) return false;
+    return !q || [r.name, r.phone, r.email, r.university, r.major, r.comment].some(v => (v || '').toLowerCase().includes(q));
+  });
+}
+
+const pill = v => v ? el('span', 'pill p' + v, '★ ' + v) : el('span', 'dash', '-');
+const sub = (text, dir) => { const e = el('div', 'sub', text); if (dir) e.dir = dir; return e; };
+const main = (text, cls, dir) => { const e = el('div', 'main ' + (cls || ''), text); if (dir) e.dir = dir; return e; };
+
+function renderTable() {
+  const head = $('head'); head.innerHTML = '';
+  ['cDate', 'cName', 'cContact', 'cUni', 'cLevel', 'cOverall', 'cStudy', 'cCourses', 'cRec', 'cComment'].forEach(k => head.appendChild(el('th', null, t(k))));
+
+  const rows = filtered();
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  page = Math.min(page, pages);
+  const start = (page - 1) * PAGE, slice = rows.slice(start, start + PAGE);
+  const tbody = $('rows'); tbody.innerHTML = '';
+
+  const state = key => { const tr = el('tr'), td = el('td', 'state', t(key)); td.colSpan = 10; tr.appendChild(td); tbody.appendChild(tr); };
+  if (!loaded) state('loading');
+  else if (failed) state('loadError');
+  else if (!all.length) state('noData');
+  else if (!rows.length) state('empty');
+
+  slice.forEach(r => {
+    const tr = el('tr'), d = new Date(r.created_at);
+    let td = el('td', 'nowrap');
+    td.append(main(d.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' })), sub(d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })));
+    tr.appendChild(td);
+
+    td = el('td'); td.appendChild(main(r.name || '-', 'strong', 'auto')); tr.appendChild(td);
+
+    td = el('td'); td.appendChild(main(r.phone || '-', '', 'ltr'));
+    if (r.email) td.appendChild(sub(r.email, 'ltr'));
+    tr.appendChild(td);
+
+    td = el('td'); td.appendChild(main(r.university || '-', '', 'auto'));
+    if (r.major) td.appendChild(sub(r.major, 'auto'));
+    tr.appendChild(td);
+
+    td = el('td'); td.appendChild(main(t('levels')[r.study_level] || '-'));
+    if (t('sources')[r.heard_about]) td.appendChild(sub(t('sources')[r.heard_about]));
+    tr.appendChild(td);
+
+    [r.overall, r.study_zone, r.courses].forEach(v => { td = el('td'); td.appendChild(pill(v)); tr.appendChild(td); });
+
+    td = el('td');
+    td.appendChild(r.recommend ? el('span', 'badge b-' + r.recommend, t('rec_' + r.recommend)) : el('span', 'dash', '-'));
+    tr.appendChild(td);
+
+    td = el('td', 'comment');
+    if (r.comment) {
+      const c = el('div', 'clamp', r.comment);       // textContent: comments can't inject HTML
+      c.dir = 'auto'; c.title = t('expand');
+      c.onclick = () => c.classList.toggle('open');
+      td.appendChild(c);
+    } else td.appendChild(el('span', 'dash', '-'));
+    tr.appendChild(td);
+
+    tbody.appendChild(tr);
+  });
+
+  const n = rows.length;
+  $('info').textContent = n ? t('showing').replace('{a}', start + 1).replace('{b}', start + slice.length).replace('{n}', n) : '';
+  $('prev').disabled = page <= 1;
+  $('next').disabled = page >= pages;
+}
+
+// ---------- Events ----------
+$('langBtn').onclick = () => { lang = lang === 'en' ? 'ar' : 'en'; localStorage.setItem('lang', lang); applyLang(); };
+$('refresh').onclick = load;
+$('q').oninput = () => { page = 1; renderTable(); };
+$('min').onchange = () => { page = 1; renderTable(); };
+$('level').onchange = () => { page = 1; renderTable(); };
+$('prev').onclick = () => { page--; renderTable(); };
+$('next').onclick = () => { page++; renderTable(); };
+
+// highlight the sidebar link of the section being viewed
+const nav = { overview: $('nav-overview'), ratings: $('nav-ratings') };
+function markNav() {
+  const inRatings = $('ratings').getBoundingClientRect().top < window.innerHeight * 0.4;
+  nav.overview.classList.toggle('active', !inRatings);
+  nav.ratings.classList.toggle('active', inRatings);
+}
+window.addEventListener('scroll', markNav, { passive: true });
+
+applyLang();
 load();
 </script>
 </body>

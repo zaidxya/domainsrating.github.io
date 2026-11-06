@@ -1,3 +1,7 @@
+// Backend origin for form submissions. Leave empty when the API is served from the same origin;
+// on GitHub Pages set it to the deployed server, e.g. "https://your-app.onrender.com".
+const API_BASE = "";
+
 const T = {
   en: {
     title: 'Domains Feedback Form',
@@ -65,7 +69,7 @@ const T = {
 
 const STAR = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M12 2.5l2.94 5.96 6.58.96-4.76 4.64 1.12 6.55L12 17.52l-5.88 3.09 1.12-6.55L2.48 9.42l6.58-.96z"/></svg>';
 
-let lang = localStorage.getItem('lang') === 'ar' ? 'ar' : 'en';
+let lang = localStorage.getItem('lang') === 'en' ? 'en' : 'ar';   // Arabic is the default language
 const values = { overall: 0, study_zone: 0, courses: 0 };
 let recommend = '';
 const scales = [];
@@ -194,7 +198,7 @@ form.onsubmit = async e => {
   const btn = f.querySelector('.submit');
   btn.disabled = true;
   try {
-    const r = await fetch('/api/ratings', {
+    const r = await fetch(API_BASE + '/api/ratings', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     });
     if (r.status === 429) { msg.textContent = T[lang].tooMany; msg.classList.add('error'); return; }
